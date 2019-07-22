@@ -11,7 +11,7 @@
             var api = "http://money.finance.sina.com.cn/quotes_service/api/jsonp_v2.php/var " + varnameJSONP + "=/CN_MarketData.getKLineData?"
                 + "symbol=" + symbol + "&"
                 + "scale=" + unit + "&"
-                + "ma=no&datalen=4"
+                + "ma=no&datalen=5"
             ;
 
             $.getScript(api, function(response, status) {
