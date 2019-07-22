@@ -1,0 +1,123 @@
+<html>
+<head>
+    <meta http-equiv="content-type" content="text/html;charset=utf-8">
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js"></script>
+    <script type="text/javascript">
+    //抓取json接口（不支持跨域）：http://money.finance.sina.com.cn/quotes_service/api/json_v2.php/CN_MarketData.getKLineData?symbol=sz399008&scale=1200&ma=no&datalen=10
+    //抓取json接口（支持跨域）：http://money.finance.sina.com.cn/quotes_service/api/jsonp_v2.php/var data=/CN_MarketData.getKLineData?symbol=sz000001&scale=240&ma=no&datalen=10
+
+        function getHistoryData(symbol, unit, callback) {
+            var varnameJSONP = "data";
+            var api = "http://money.finance.sina.com.cn/quotes_service/api/jsonp_v2.php/var " + varnameJSONP + "=/CN_MarketData.getKLineData?"
+                + "symbol=" + symbol + "&"
+                + "scale=" + unit + "&"
+                + "ma=no&datalen=4"
+            ;
+
+            $.getScript(api, function(response, status) {
+                callback(window[varnameJSONP]);
+            });
+        }
+
+        function getNewestData(symbol, callback) {
+            var varnameJSONP = "hq_str_" + symbol;
+            var api = "http://hq.sinajs.cn/list=" + symbol;
+            $.ajax({url:api, dataType:"script", cache:true, 
+                success:function(response, status) {
+                    var data = window[varnameJSONP].split(",");
+                    callback(data);
+                }
+            });
+        }
+
+        function showData(viewModel) {
+
+            if (viewModel.hs300.length==4 && viewModel.zz500.length==4 && viewModel.zx300.length==4) {
+                $($("#hs300").children().get(0)).text(viewModel.hs300[0]);
+                $($("#hs300").children().get(1)).text(viewModel.hs300[1] + "(现价)");
+                $($("#hs300").children().get(2)).text(viewModel.hs300[3] + "(" + viewModel.hs300[2] + "收盘)");
+                $($("#hs300").children().get(3)).text( ((viewModel.hs300[1] - viewModel.hs300[3])/viewModel.hs300[3]).toFixed(3) );
+
+                $($("#zz500").children().get(0)).text(viewModel.zz500[0]);
+                $($("#zz500").children().get(1)).text(viewModel.zz500[1] + "(现价)");
+                $($("#zz500").children().get(2)).text(viewModel.zz500[3] + "(" + viewModel.zz500[2] + "收盘)");
+                $($("#zz500").children().get(3)).text( ((viewModel.zz500[1] - viewModel.zz500[3])/viewModel.zz500[3]).toFixed(3) );
+                
+                $($("#zx300").children().get(0)).text(viewModel.zx300[0]);
+                $($("#zx300").children().get(1)).text(viewModel.zx300[1] + "(现价)");
+                $($("#zx300").children().get(2)).text(viewModel.zx300[3] + "(" + viewModel.zx300[2] + "收盘)");
+                $($("#zx300").children().get(3)).text( ((viewModel.zx300[1] - viewModel.zx300[3])/viewModel.zx300[3]).toFixed(3) );
+            }
+            
+        }
+
+        function refreshData() {
+            const HOUR = 60, DAY = 240, WEEK = 1200;
+            var vm = {
+                hs300: [],
+                zz500: [],
+                zx300: []
+            };
+
+            getNewestData("sz399300", function(data) {
+                vm.hs300[0] = data[0];
+                vm.hs300[1] = new Number(data[3]);
+                showData(vm);
+            });
+            getHistoryData("sz399300", WEEK, function(data) {
+                vm.hs300[2] = data[0].day;
+                vm.hs300[3] = new Number(data[0].close);
+                showData(vm);
+            });
+
+            getNewestData("sz399905", function(data) {
+                vm.zz500[0] = data[0];
+                vm.zz500[1] = new Number(data[3]);
+                showData(vm);
+            });
+            getHistoryData("sz399905", WEEK, function(data) {
+                vm.zz500[2] = data[0].day;
+                vm.zz500[3] = new Number(data[0].close);
+                showData(vm);
+            });
+
+            getNewestData("sz399008", function(data) {
+                vm.zx300[0] = data[0];
+                vm.zx300[1] = new Number(data[3]);
+                showData(vm);
+            });
+            getHistoryData("sz399008", WEEK, function(data) {
+                vm.zx300[2] = data[0].day;
+                vm.zx300[3] = new Number(data[0].close);
+                showData(vm);
+            });
+
+        }
+
+        $(document).ready(refreshData);
+    </script>
+</head>
+<body>
+    <dl id="hs300">
+        <dt></dt>
+        <dd></dd>
+        <dd></dd>
+        <dd></dd>
+    </dl>
+    <dl id="zz500">
+        <dt></dt>
+        <dd></dd>
+        <dd></dd>
+        <dd></dd>
+    </dl>
+    <dl id="zx300">
+        <dt></dt>
+        <dd></dd>
+        <dd></dd>
+        <dd></dd>
+    </dl>
+    <div>
+        <button onclick="refreshData()">刷新</button>
+    </div>
+</body>
+</html>
