@@ -36,6 +36,7 @@
             if (viewModel.hs300.length==4 && viewModel.zz500.length==4 && viewModel.zx300.length==4) {
                 var today = new Date();
                 var todayISO = today.getFullYear()+'-'+('0'+(today.getMonth()+1)).substr(-2,2)+'-'+('0'+today.getDate()).substr(-2,2);
+                $("#today").text(todayISO);
 
                 $($("#hs300").children().get(0)).text(viewModel.hs300[0]);
                 $($("#hs300").children().get(1)).text(viewModel.hs300[1]);
@@ -109,6 +110,10 @@
 <body>
     <table border="1px">
         <tr>
+            <th colspan="4">今天是：<span id="today"></span>号</th>
+            <th><button onclick="refreshData()">刷新</button></p></th>
+        </tr>
+        <tr>
             <th>名称</th>
             <th>四周前日期</th>
             <th>四周前收盘</th>
@@ -137,8 +142,5 @@
             <td></td>
         </tr>
     </table>
-    <div>
-        <button onclick="refreshData()">刷新</button>
-    </div>
 </body>
 </html>
