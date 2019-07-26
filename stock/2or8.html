@@ -1,6 +1,7 @@
 <html>
 <head>
     <meta http-equiv="content-type" content="text/html;charset=utf-8">
+    <title>二八轮动测算</title>
     <script src="https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js"></script>
     <script type="text/javascript">
     //抓取json接口（不支持跨域）：http://money.finance.sina.com.cn/quotes_service/api/json_v2.php/CN_MarketData.getKLineData?symbol=sz399008&scale=1200&ma=no&datalen=10
@@ -33,20 +34,28 @@
         function showData(viewModel) {
 
             if (viewModel.hs300.length==4 && viewModel.zz500.length==4 && viewModel.zx300.length==4) {
+                var today = new Date();
+                var todayISO = today.getFullYear()+'-'+('0'+(today.getMonth()+1)).substr(-2,2)+'-'+('0'+today.getDate()).substr(-2,2);
+
                 $($("#hs300").children().get(0)).text(viewModel.hs300[0]);
-                $($("#hs300").children().get(1)).text(viewModel.hs300[1] + "(现价)");
-                $($("#hs300").children().get(2)).text(viewModel.hs300[3] + "(" + viewModel.hs300[2] + "收盘)");
-                $($("#hs300").children().get(3)).text( ((viewModel.hs300[1] - viewModel.hs300[3])/viewModel.hs300[3]).toFixed(3) );
+                $($("#hs300").children().get(1)).text(viewModel.hs300[1]);
+                $($("#hs300").children().get(2)).text(viewModel.hs300[2]);
+                $($("#hs300").children().get(3)).text(viewModel.hs300[3]);
+                $($("#hs300").children().get(4)).text( ((viewModel.hs300[3] - viewModel.hs300[2]) / viewModel.hs300[2]  * 100).toFixed(3) + "%" );
 
                 $($("#zz500").children().get(0)).text(viewModel.zz500[0]);
-                $($("#zz500").children().get(1)).text(viewModel.zz500[1] + "(现价)");
-                $($("#zz500").children().get(2)).text(viewModel.zz500[3] + "(" + viewModel.zz500[2] + "收盘)");
-                $($("#zz500").children().get(3)).text( ((viewModel.zz500[1] - viewModel.zz500[3])/viewModel.zz500[3]).toFixed(3) );
+                $($("#zz500").children().get(1)).text(viewModel.zz500[1]);
+                $($("#zz500").children().get(2)).text(viewModel.zz500[2]);
+                $($("#zz500").children().get(3)).text(viewModel.zz500[3]);
+                $($("#zz500").children().get(4)).text( ((viewModel.zz500[3] - viewModel.zz500[2]) / viewModel.zz500[2] * 100).toFixed(3) + "%" );
                 
                 $($("#zx300").children().get(0)).text(viewModel.zx300[0]);
-                $($("#zx300").children().get(1)).text(viewModel.zx300[1] + "(现价)");
-                $($("#zx300").children().get(2)).text(viewModel.zx300[3] + "(" + viewModel.zx300[2] + "收盘)");
-                $($("#zx300").children().get(3)).text( ((viewModel.zx300[1] - viewModel.zx300[3])/viewModel.zx300[3]).toFixed(3) );
+                $($("#zx300").children().get(1)).text(viewModel.zx300[1]);
+                $($("#zx300").children().get(2)).text(viewModel.zx300[2]);
+                $($("#zx300").children().get(3)).text(viewModel.zx300[3]);
+                $($("#zx300").children().get(4)).text( ((viewModel.zx300[3] - viewModel.zx300[2]) / viewModel.zx300[2] * 100).toFixed(3) + "%" );
+            } else {
+                console.log("viewModel数据不完整, 忽略本次调用");
             }
             
         }
@@ -61,34 +70,34 @@
 
             getNewestData("sz399300", function(data) {
                 vm.hs300[0] = data[0];
-                vm.hs300[1] = new Number(data[3]);
+                vm.hs300[3] = new Number(data[3]);
                 showData(vm);
             });
             getHistoryData("sz399300", WEEK, function(data) {
-                vm.hs300[2] = data[0].day;
-                vm.hs300[3] = new Number(data[0].close);
+                vm.hs300[1] = data[0].day;
+                vm.hs300[2] = new Number(data[0].close);
                 showData(vm);
             });
 
             getNewestData("sz399905", function(data) {
                 vm.zz500[0] = data[0];
-                vm.zz500[1] = new Number(data[3]);
+                vm.zz500[3] = new Number(data[3]);
                 showData(vm);
             });
             getHistoryData("sz399905", WEEK, function(data) {
-                vm.zz500[2] = data[0].day;
-                vm.zz500[3] = new Number(data[0].close);
+                vm.zz500[1] = data[0].day;
+                vm.zz500[2] = new Number(data[0].close);
                 showData(vm);
             });
 
             getNewestData("sz399008", function(data) {
                 vm.zx300[0] = data[0];
-                vm.zx300[1] = new Number(data[3]);
+                vm.zx300[3] = new Number(data[3]);
                 showData(vm);
             });
             getHistoryData("sz399008", WEEK, function(data) {
-                vm.zx300[2] = data[0].day;
-                vm.zx300[3] = new Number(data[0].close);
+                vm.zx300[1] = data[0].day;
+                vm.zx300[2] = new Number(data[0].close);
                 showData(vm);
             });
 
@@ -98,24 +107,36 @@
     </script>
 </head>
 <body>
-    <dl id="hs300">
-        <dt></dt>
-        <dd></dd>
-        <dd></dd>
-        <dd></dd>
-    </dl>
-    <dl id="zz500">
-        <dt></dt>
-        <dd></dd>
-        <dd></dd>
-        <dd></dd>
-    </dl>
-    <dl id="zx300">
-        <dt></dt>
-        <dd></dd>
-        <dd></dd>
-        <dd></dd>
-    </dl>
+    <table border="1px">
+        <tr>
+            <th>名称</th>
+            <th>四周前日期</th>
+            <th>四周前收盘</th>
+            <th>今日现价</th>
+            <th>涨幅</th>
+        </tr>
+        <tr id="hs300">
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr id="zz500">
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr id="zx300">
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+    </table>
     <div>
         <button onclick="refreshData()">刷新</button>
     </div>
