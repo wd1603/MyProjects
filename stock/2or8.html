@@ -3,7 +3,8 @@
     <meta http-equiv="content-type" content="text/html;charset=utf-8">
     <meta name="viewport" content="width=device-width,user-scalable=no">
     <title>二八轮动测算</title>
-    <script src="https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js"></script>
     <script type="text/javascript">
     //抓取json接口（不支持跨域）：http://money.finance.sina.com.cn/quotes_service/api/json_v2.php/CN_MarketData.getKLineData?symbol=sz399008&scale=1200&ma=no&datalen=10
     //抓取json接口（支持跨域）：http://money.finance.sina.com.cn/quotes_service/api/jsonp_v2.php/var data=/CN_MarketData.getKLineData?symbol=sz000001&scale=240&ma=no&datalen=10
@@ -32,76 +33,82 @@
             });
         }
 
-        function showData(viewModel) {
+        function showData(today, viewModel) {
 
-            if (viewModel.hs300.length==4 && viewModel.zz500.length==4 && viewModel.zx300.length==4) {
-                var today = new Date();
-                var todayISO = today.getFullYear()+'-'+('0'+(today.getMonth()+1)).substr(-2,2)+'-'+('0'+today.getDate()).substr(-2,2);
-                $("#today").text(todayISO);
+            if (viewModel.sz399300.length===8 && viewModel.sz399905.length===8 && viewModel.sz399008.length===8) {
+                $("#today").text(today.format('YYYY-MM-DD'));
 
-                $($("#hs300").children().get(0)).text(viewModel.hs300[0]);
-                $($("#hs300").children().get(1)).text(viewModel.hs300[1]);
-                $($("#hs300").children().get(2)).text(viewModel.hs300[2]);
-                $($("#hs300").children().get(3)).text(viewModel.hs300[3]);
-                $($("#hs300").children().get(4)).text( ((viewModel.hs300[3] - viewModel.hs300[2]) / viewModel.hs300[2]  * 100).toFixed(3) + "%" );
+                $($("#hs300").children().get(0)).text(viewModel.sz399300[0]);
+                $($("#hs300").children().get(1)).text(viewModel.sz399300[1] + "%");
+                $($("#hs300").children().get(2)).text(viewModel.sz399300[2] + "%");
+                $($("#hs300").children().get(3)).text(viewModel.sz399300[3]);
+                $($("#hs300").children().get(4)).text(viewModel.sz399300[4]);
+                $($("#hs300").children().get(5)).text(viewModel.sz399300[5]);
+                $($("#hs300").children().get(6)).text(viewModel.sz399300[6]);
+                $($("#hs300").children().get(7)).text(viewModel.sz399300[7]);
 
-                $($("#zz500").children().get(0)).text(viewModel.zz500[0]);
-                $($("#zz500").children().get(1)).text(viewModel.zz500[1]);
-                $($("#zz500").children().get(2)).text(viewModel.zz500[2]);
-                $($("#zz500").children().get(3)).text(viewModel.zz500[3]);
-                $($("#zz500").children().get(4)).text( ((viewModel.zz500[3] - viewModel.zz500[2]) / viewModel.zz500[2] * 100).toFixed(3) + "%" );
+                $($("#zz500").children().get(0)).text(viewModel.sz399905[0]);
+                $($("#zz500").children().get(1)).text(viewModel.sz399905[1] + "%");
+                $($("#zz500").children().get(2)).text(viewModel.sz399905[2] + "%");
+                $($("#zz500").children().get(3)).text(viewModel.sz399905[3]);
+                $($("#zz500").children().get(4)).text(viewModel.sz399905[4]);
+                $($("#zz500").children().get(5)).text(viewModel.sz399905[5]);
+                $($("#zz500").children().get(6)).text(viewModel.sz399905[6]);
+                $($("#zz500").children().get(7)).text(viewModel.sz399905[7]);
                 
-                $($("#zx300").children().get(0)).text(viewModel.zx300[0]);
-                $($("#zx300").children().get(1)).text(viewModel.zx300[1]);
-                $($("#zx300").children().get(2)).text(viewModel.zx300[2]);
-                $($("#zx300").children().get(3)).text(viewModel.zx300[3]);
-                $($("#zx300").children().get(4)).text( ((viewModel.zx300[3] - viewModel.zx300[2]) / viewModel.zx300[2] * 100).toFixed(3) + "%" );
+                $($("#zx300").children().get(0)).text(viewModel.sz399008[0]);
+                $($("#zx300").children().get(1)).text(viewModel.sz399008[1] + "%");
+                $($("#zx300").children().get(2)).text(viewModel.sz399008[2] + "%");
+                $($("#zx300").children().get(3)).text(viewModel.sz399008[3]);
+                $($("#zx300").children().get(4)).text(viewModel.sz399008[4]);
+                $($("#zx300").children().get(5)).text(viewModel.sz399008[5]);
+                $($("#zx300").children().get(6)).text(viewModel.sz399008[6]);
+                $($("#zx300").children().get(7)).text(viewModel.sz399008[7]);
             } else {
-                console.log("viewModel数据不完整, 忽略本次调用");
+                console.log("viewModel数据不完整, 忽略本次调用", viewModel);
             }
             
         }
 
+        
+
         function refreshData() {
             const HOUR = 60, DAY = 240, WEEK = 1200;
             var vm = {
-                hs300: [],
-                zz500: [],
-                zx300: []
+                sz399300: [], // 0名称, 1四周涨幅, 2三周涨幅, 3现价, 4四周前日期, 5四周前收盘, 6三周前日期, 7三周前收盘
+                sz399905: [],
+                sz399008: []
             };
 
-            getNewestData("sz399300", function(data) {
-                vm.hs300[0] = data[0];
-                vm.hs300[3] = new Number(data[3]);
-                showData(vm);
-            });
-            getHistoryData("sz399300", WEEK, function(data) {
-                vm.hs300[1] = data[0].day;
-                vm.hs300[2] = new Number(data[0].close);
-                showData(vm);
-            });
+            const today = moment().utcOffset('+08:00');
+            const startMoment = moment().utcOffset('+08:00').isoWeekday(-28); // 四周前周日
+            const endMoment = moment().utcOffset('+08:00').isoWeekday(-22); // 四周前周六
+            // console.log(startMoment.format('YYYY-MM-DD'), endMoment.format('YYYY-MM-DD'));
 
-            getNewestData("sz399905", function(data) {
-                vm.zz500[0] = data[0];
-                vm.zz500[3] = new Number(data[3]);
-                showData(vm);
-            });
-            getHistoryData("sz399905", WEEK, function(data) {
-                vm.zz500[1] = data[0].day;
-                vm.zz500[2] = new Number(data[0].close);
-                showData(vm);
-            });
+            const loadDataPromises = Object.keys(vm).map(code => new Promise((resolve) => {
+                getHistoryData(code, WEEK, (historyData) => {
+                    const index4WeekAgo = historyData.findIndex((datum) => {
+                        const datumMoment = moment(datum.day);
+                        return startMoment.isBefore(datumMoment) && endMoment.isAfter(datumMoment);
+                    });
+                    const index3WeekAgo = index4WeekAgo + 1;
 
-            getNewestData("sz399008", function(data) {
-                vm.zx300[0] = data[0];
-                vm.zx300[3] = new Number(data[3]);
-                showData(vm);
-            });
-            getHistoryData("sz399008", WEEK, function(data) {
-                vm.zx300[1] = data[0].day;
-                vm.zx300[2] = new Number(data[0].close);
-                showData(vm);
-            });
+                    vm[code][4] = historyData[index4WeekAgo].day;
+                    vm[code][5] = new Number(historyData[index4WeekAgo].close);
+                    vm[code][6] = historyData[index3WeekAgo].day;
+                    vm[code][7] = new Number(historyData[index3WeekAgo].close);
+
+                    getNewestData(code, (getNewestData) => {
+                        vm[code][0] = getNewestData[0];
+                        vm[code][3] = new Number(getNewestData[3]);
+                        vm[code][1] = ((vm[code][3] - vm[code][5]) / vm[code][5] * 100).toFixed(3);
+                        vm[code][2] = ((vm[code][3] - vm[code][7]) / vm[code][7] * 100).toFixed(3);
+
+                        resolve();
+                    });
+                });
+            }));
+            Promise.all(loadDataPromises).then(() => showData(today, vm)).catch((err) => console.warn(err));
 
         }
 
@@ -111,17 +118,23 @@
 <body>
     <table border="1px">
         <tr>
-            <th colspan="4">今天是：<span id="today"></span>号</th>
-            <th><button onclick="refreshData()">刷新</button></p></th>
+            <th colspan="3"><button onclick="refreshData()">刷新</button></p></th>
+            <th colspan="5">今天：<span id="today"></span></th>
         </tr>
         <tr>
             <th>名称</th>
+            <th>近四周涨幅</th>
+            <th>近三周涨幅</th>
+            <th>今日现价</th>
             <th>四周前日期</th>
             <th>四周前收盘</th>
-            <th>今日现价</th>
-            <th>涨幅</th>
+            <th>三周前日期</th>
+            <th>三周前收盘</th>
         </tr>
         <tr id="hs300">
+            <td></td>
+            <td></td>
+            <td></td>
             <td></td>
             <td></td>
             <td></td>
@@ -134,6 +147,9 @@
             <td></td>
             <td></td>
             <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
         </tr>
         <tr id="zx300">
             <td></td>
@@ -141,7 +157,12 @@
             <td></td>
             <td></td>
             <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
         </tr>
     </table>
+    <p>近四周涨幅：二八切换标准，周五收盘前，决定“买入/卖出/转换”哪个指数。</p>
+    <p>近三周涨幅：二八切换预估，下周上涨/下跌多少会导致切换。</p>
 </body>
 </html>
